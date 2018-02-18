@@ -1,6 +1,7 @@
 package functions;
 
 /**
+ * Polynomial
  * @author Ondrej Kratochvil
  */
 public class Polynomial extends Function {
@@ -20,6 +21,14 @@ public class Polynomial extends Function {
             result += coefficients[j] * Math.pow(x, j);
 
         return result;
+    }
+
+    /**
+     * Getter for degree.
+     * @return int the degree.
+     */
+    public int degree() {
+        return degree;
     }
 
     @Override

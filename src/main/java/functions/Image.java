@@ -1,6 +1,7 @@
 package functions;
 
 /**
+ * Functional interface for CustomFunction
  * @author Ondrej Kratochvil
  */
 @FunctionalInterface

@@ -1,27 +1,45 @@
 package polynomial_curve_fitting;
 
 import Jama.Matrix;
+import functions.Function;
 import functions.Polynomial;
 import polynomial_curve_fitting.utils.ErrorRMS;
-
 
 /**
  * Basic Polynomial Curve Fitting.
  * Splits available data to training set and validation set.
  * Determines best polynomial coefficients by minimizing an error function with training set.
- * Optimizes with validation set.
- * No regularization used to control the over-fitting.
  *
+ * Polynomial:
+ * y(x[n], w) = sum(w[j] * x[n]^j) from j=0 to M,
+ * where vector w = (w[0], w[1], ... w[M])
+ *
+ * Least squares method minimizes error function E(w).
+ * E(w) = 1/2 * sum( ((y(x[n], w) - t[n])^2 ) from n=1 to N,
+ * where vector x is training and vector t are corresponding targets.
+ *
+ * Model selection, i.e. selection of the polynomial degree,
+ * is done by finding lowest root-mean-square error with validation data for each degree.
+ *
+ * No regularization used to control the over-fitting.
  * @author Ondrej Kratochvil
  */
-public class BasicPolynomialCurveFitting extends PolynomialCurveFitting {
+public class LeastSquaresPCF implements PolynomialCurveFitting {
 
     private static final int MAX_DEGREE = 50; // max polynomial degree
-    private static final float SPLIT_RATIO = 0.9f;
+    private static final float SPLIT_RATIO = 0.9f; // ratio of training and validation sets
 
+    private int size;
+    private double[] x; // vector
+    private double[] t; // targets
+    private double[] w; // coefficients of polynomial that minimizes error
+
+    private int trainingSize; // size of trainingX and trainingT
     private double[] trainingX; // fraction of x, without validation set
     private double[] trainingT; // fraction of t, without validation set
-    private int trainingSize; // size of trainingX and trainingT
+
+    private double[] validationX;
+    private double[] validationT;
 
     private double[] degreeToRMS; // maps polynomial degree to RMS error
 
@@ -30,16 +48,18 @@ public class BasicPolynomialCurveFitting extends PolynomialCurveFitting {
      * @param x the vector x
      * @param t the vector t, corresponding targets.
      */
-    public BasicPolynomialCurveFitting(double[] x, double[] t) {
-        super(x, t);
+    public LeastSquaresPCF(double[] x, double[] t) {
+        this.x = x;
+        this.t = t;
+        this.size = x.length;
         separateTrainingAndValidationSets();
-        w = getCoefficients();
+        w = findCoefficients();
     }
 
     /**
      * Splits vector x and t specified with const SPLIT_RATIO to training set and validation set.
-     * First half, i.e. training set, is copied to trainingX/trainingT for vector x/t.
-     * Vectors x and t remains untouched, i.e. training set and validation set together.
+     * First half, i.e. training set, is copied to trainingX (trainingT) for vector x (t).
+     * Second half, i.e. validation set, is copied to validationX (validationT) for vector x (t).
      */
     private void separateTrainingAndValidationSets() {
         trainingSize = Math.round(x.length * SPLIT_RATIO);
@@ -49,6 +69,12 @@ public class BasicPolynomialCurveFitting extends PolynomialCurveFitting {
         trainingT = new double[trainingSize];
         System.arraycopy(x, 0, trainingX, 0, trainingSize);
         System.arraycopy(t, 0, trainingT, 0, trainingSize);
+
+        // prepare validation set
+        validationX = new double[size - trainingSize];
+        validationT = new double[size - trainingSize];
+        System.arraycopy(x, 0, validationX, 0, size - trainingSize);
+        System.arraycopy(t, 0, validationT, 0, size - trainingSize);
     }
 
     /**
@@ -56,7 +82,7 @@ public class BasicPolynomialCurveFitting extends PolynomialCurveFitting {
      * where polynomial(x) = sum(w[i] * x^i) from i=0 to M
      * @return double[] the vector w,
      */
-    protected double[] getCoefficients() {
+    private double[] findCoefficients() {
         degreeToRMS = new double[MAX_DEGREE + 1];
         double minimalRMS = Double.MAX_VALUE;
         double RMS;
@@ -77,8 +103,8 @@ public class BasicPolynomialCurveFitting extends PolynomialCurveFitting {
             for (int m = 0; m <= degree; ++m)
                 tempW[m] = ans.get(m, 0);
 
-            // compute RMS error, use all available data (training + validation) to compute the root-mean-square error
-            RMS = ErrorRMS.get(new Polynomial(tempW), x, t);
+            // compute RMS error, use validation data to compute the root-mean-square error
+            RMS = ErrorRMS.get(new Polynomial(tempW), validationX, validationT);
             degreeToRMS[degree] = RMS;
 
             // updates vector w if RMS is lower than the previous one found
@@ -133,10 +159,39 @@ public class BasicPolynomialCurveFitting extends PolynomialCurveFitting {
         return A;
     }
 
-    /**
-     * Getter for degreeToRMS
-     * @return double[] the mapped polynomial degree to its RMS error
-     */
+    @Override
+    public Function polynomial() {
+        if (w == null) w = findCoefficients();
+        return new Polynomial(w);
+    }
+
+    @Override
+    public double[] coefficients() {
+        if (w == null) w = findCoefficients();
+        return w;
+    }
+
+    @Override
+    public int degree() {
+        return ((Polynomial) polynomial()).degree();
+    }
+
+    @Override
+    public double[] x() {
+        return x;
+    }
+
+    @Override
+    public double[] t() {
+        return t;
+    }
+
+    @Override
+    public double errorRMS() {
+        return ErrorRMS.get(polynomial(), x, t);
+    }
+
+    @Override
     public double[] getDegreeToRMS() {
         return degreeToRMS;
     }

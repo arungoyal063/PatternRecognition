@@ -1,6 +1,7 @@
 package functions;
 
 /**
+ * Sin
  * @author Ondrej Kratochvil
  */
 public class Sin extends Function {

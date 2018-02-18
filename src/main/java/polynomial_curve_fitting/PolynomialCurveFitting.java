@@ -1,11 +1,9 @@
 package polynomial_curve_fitting;
 
 import functions.Function;
-import functions.Polynomial;
-import polynomial_curve_fitting.utils.ErrorRMS;
 
 /**
- * Abstract class Polynomial Curve Fitting
+ * Polynomial Curve Fitting
  *
  * N is the size of the set
  * M is the polynomial degree
@@ -18,60 +16,48 @@ import polynomial_curve_fitting.utils.ErrorRMS;
  *
  * @author Ondrej Kratochvil
  */
-public abstract class PolynomialCurveFitting {
-
-    double[] x; // vector
-    double[] t; // targets
-    int size;
-
-    double[] w; // coefficients of polynomial that minimizes error
-    int degree;
+public interface PolynomialCurveFitting {
 
     /**
-     * Basic constructor for Polynomial Curve Fitting consisting of vectors x and t.
-     * @param x the vector x
-     * @param t the vector t, corresponding targets.
+     * Getter for optimal polynomial
+     * @return Function the polynomial
      */
-    public PolynomialCurveFitting(double[] x, double[] t) {
-        this.x = x;
-        this.t = t;
-        this.size = x.length;
-    }
+    Function polynomial();
 
     /**
      * Find optimal polynomial coefficients,
      * where polynomial(x) = sum(w[i] * x^i) from i=0 to M
-     * @return double[] the vector w,
+     * @return double[] the vector w
      */
-    protected abstract double[] getCoefficients();
-
-    public double[] getVector() { return x; }
-    public double[] getTargets() { return t; }
-
-    /**
-     * Computes the root-mean-square error for polynomial that minimizes error.
-     * @return double the root-mean-square error
-     */
-    public double errorRMS() {
-        return ErrorRMS.get(getPolynomial(), x, t);
-    }
-
-    /**
-     * Creates new instance of Polynomial that minimizes error.
-     * @return the Polynomial
-     */
-    public Function getPolynomial() {
-        if (w == null)
-            w = getCoefficients();
-
-        return new Polynomial(w);
-    }
+    double[] coefficients();
 
     /**
      * Getter for degree of optimal polynomial
      * @return int the degree
      */
-    public int getDegree() {
-        return degree;
-    }
+    int degree();
+
+    /**
+     * Getter for vector x
+     * @return double[] the vector x
+     */
+    double[] x();
+
+    /**
+     * Getter for vector t
+     * @return double[] the vector t
+     */
+    double[] t();
+
+    /**
+     * Computes the root-mean-square error for optimal polynomial
+     * @return double the root-mean-square error
+     */
+    double errorRMS();
+
+    /**
+     * Getter for degreeToRMS
+     * @return double[] the mapped polynomial degree to its RMS error
+     */
+    double[] getDegreeToRMS();
 }

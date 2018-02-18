@@ -1,25 +1,26 @@
 package functions;
 
 /**
+ * Custom function.
  * @author Ondrej Kratochvil
  */
 public class CustomFunction extends Function {
 
-    private Image comp;
+    private Image img;
     private String name;
 
-    public CustomFunction(Image comp) {
-        this(comp, "custom function");
+    public CustomFunction(Image img) {
+        this(img, "custom function");
     }
 
-    public CustomFunction(Image comp, String name) {
-        this.comp = comp;
+    public CustomFunction(Image img, String name) {
+        this.img = img;
         this.name = name;
     }
 
     @Override
     public double f(double x) {
-        return comp.compute(x);
+        return img.compute(x);
     }
 
     @Override
