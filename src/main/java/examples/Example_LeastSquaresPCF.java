@@ -14,7 +14,7 @@ import static java.lang.Math.*;
  * Example for LeastSquaresPCF
  * @author Ondrej Kratochvil
  */
-public class BasicPolynomialCurveFittingExample {
+public class Example_LeastSquaresPCF {
 
     private static final int TRAINING_SET_SIZE = 100;
 
