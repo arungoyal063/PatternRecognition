@@ -9,7 +9,7 @@ public class Utils {
         return (Math.random() * range) + min;
     }
 
-    public static double[] randomArray(int size, double min, double max) {
+    public static double[] randomVector(int size, double min, double max) {
         double[] x = new double[size];
 
         for (int i = 0; i < size; ++i)
@@ -17,8 +17,8 @@ public class Utils {
         return x;
     }
 
-    public static double[] randomSortedArray(int size, double min, double max) {
-        double[] x = randomArray(size, min, max);
+    public static double[] randomSortedVector(int size, double min, double max) {
+        double[] x = randomVector(size, min, max);
         Arrays.sort(x);
         return x;
     }

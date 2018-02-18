@@ -57,7 +57,15 @@ public interface PolynomialCurveFitting {
 
     /**
      * Getter for degreeToRMS
+     * double[i], where is is degree
      * @return double[] the mapped polynomial degree to its RMS error
      */
     double[] getDegreeToRMS();
+
+    /**
+     * Getter for degreeLambdaToRMS
+     * double[i][j], where i is degree and j is negation of ln(λ)
+     * @return double[][] the mapped polynomial degree to its RMS error
+     */
+    double[][] getDegreeLambdaToRMS();
 }

@@ -3,7 +3,9 @@ package polynomial_curve_fitting;
 import Jama.Matrix;
 import functions.Function;
 import functions.Polynomial;
-import polynomial_curve_fitting.utils.ErrorRMS;
+import polynomial_curve_fitting.utils.Error;
+
+import static java.lang.Math.pow;
 
 /**
  * Basic Polynomial Curve Fitting.
@@ -14,7 +16,7 @@ import polynomial_curve_fitting.utils.ErrorRMS;
  * y(x[n], w) = sum(w[j] * x[n]^j) from j=0 to M,
  * where vector w = (w[0], w[1], ... w[M])
  *
- * Least squares method minimizes error function E(w).
+ * Least squares method minimizes sum-of-squares error function E(w).
  * E(w) = 1/2 * sum( ((y(x[n], w) - t[n])^2 ) from n=1 to N,
  * where vector x is training and vector t are corresponding targets.
  *
@@ -22,24 +24,26 @@ import polynomial_curve_fitting.utils.ErrorRMS;
  * is done by finding lowest root-mean-square error with validation data for each degree.
  *
  * No regularization used to control the over-fitting.
+ *
+ * @see polynomial_curve_fitting.PolynomialCurveFitting for vector definitions.
  * @author Ondrej Kratochvil
  */
 public class LeastSquaresPCF implements PolynomialCurveFitting {
 
-    private static final int MAX_DEGREE = 50; // max polynomial degree
-    private static final float SPLIT_RATIO = 0.9f; // ratio of training and validation sets
+    static final int MAX_DEGREE = 50; // max polynomial degree
+    private static final float SPLIT_RATIO = 0.8f; // ratio of training and validation sets
 
     private int size;
     private double[] x; // vector
     private double[] t; // targets
-    private double[] w; // coefficients of polynomial that minimizes error
+    double[] w; // coefficients of polynomial that minimizes error
 
     private int trainingSize; // size of trainingX and trainingT
     private double[] trainingX; // fraction of x, without validation set
     private double[] trainingT; // fraction of t, without validation set
 
-    private double[] validationX;
-    private double[] validationT;
+    double[] validationX;
+    double[] validationT;
 
     private double[] degreeToRMS; // maps polynomial degree to RMS error
 
@@ -53,7 +57,6 @@ public class LeastSquaresPCF implements PolynomialCurveFitting {
         this.t = t;
         this.size = x.length;
         separateTrainingAndValidationSets();
-        w = findCoefficients();
     }
 
     /**
@@ -80,9 +83,8 @@ public class LeastSquaresPCF implements PolynomialCurveFitting {
     /**
      * Find optimal polynomial coefficients,
      * where polynomial(x) = sum(w[i] * x^i) from i=0 to M
-     * @return double[] the vector w,
      */
-    private double[] findCoefficients() {
+    protected void setCoefficients() {
         degreeToRMS = new double[MAX_DEGREE + 1];
         double minimalRMS = Double.MAX_VALUE;
         double RMS;
@@ -104,36 +106,18 @@ public class LeastSquaresPCF implements PolynomialCurveFitting {
                 tempW[m] = ans.get(m, 0);
 
             // compute RMS error, use validation data to compute the root-mean-square error
-            RMS = ErrorRMS.get(new Polynomial(tempW), validationX, validationT);
+            RMS = Error.rootMeanSquare(new Polynomial(tempW), validationX, validationT);
             degreeToRMS[degree] = RMS;
 
             // updates vector w if RMS is lower than the previous one found
             if (RMS <= minimalRMS) {
                 minimalRMS = RMS;
+                //System.out.println("new min " + RMS + " deg " + degree);
                 w = tempW;
+            } else {
+               // System.out.println("not bet " + RMS );
             }
         }
-        return w;
-    }
-
-    /**
-     * Creates vector T, where T[i] = sum(x[n]^i * t[n]) from n=1 to N,
-     * vectors x=(x[1], x[2], ... x[N]), t=(t[1], t[2], ... t[N])
-     * @param degree the int polynomial degree
-     * @return double[] the vector T
-     */
-    private double[] getT(int degree) {
-        double[] T = new double[degree + 1];
-
-        for (int i = 0; i <= degree; ++i) {
-            double sum = 0;
-
-            for (int n = 0; n < trainingSize; ++n)
-                sum += Math.pow(trainingX[n], i) * trainingT[n];
-
-            T[i] = sum;
-        }
-        return T;
     }
 
     /**
@@ -142,7 +126,7 @@ public class LeastSquaresPCF implements PolynomialCurveFitting {
      * @param degree the int polynomial degree
      * @return double[][] the matrix A
      */
-    private double[][] getA(int degree) {
+    double[][] getA(int degree) {
         double[][] A = new double[degree + 1][degree + 1];
 
         for (int i = 0; i <= degree; ++i) {
@@ -151,7 +135,7 @@ public class LeastSquaresPCF implements PolynomialCurveFitting {
                 int power = i + j;
 
                 for (int n = 0; n < trainingSize; ++n)
-                    sum += Math.pow(trainingX[n], power);
+                    sum += pow(trainingX[n], power);
 
                 A[i][j] = sum;
             }
@@ -159,15 +143,35 @@ public class LeastSquaresPCF implements PolynomialCurveFitting {
         return A;
     }
 
+    /**
+     * Creates vector T, where T[i] = sum(x[n]^i * t[n]) from n=1 to N,
+     * vectors x=(x[1], x[2], ... x[N]), t=(t[1], t[2], ... t[N])
+     * @param degree the int polynomial degree
+     * @return double[] the vector T
+     */
+    double[] getT(int degree) {
+        double[] T = new double[degree + 1];
+
+        for (int i = 0; i <= degree; ++i) {
+            double sum = 0;
+
+            for (int n = 0; n < trainingSize; ++n)
+                sum += pow(trainingX[n], i) * trainingT[n];
+
+            T[i] = sum;
+        }
+        return T;
+    }
+
     @Override
     public Function polynomial() {
-        if (w == null) w = findCoefficients();
+        if (w == null) setCoefficients();
         return new Polynomial(w);
     }
 
     @Override
     public double[] coefficients() {
-        if (w == null) w = findCoefficients();
+        if (w == null) setCoefficients();
         return w;
     }
 
@@ -188,11 +192,16 @@ public class LeastSquaresPCF implements PolynomialCurveFitting {
 
     @Override
     public double errorRMS() {
-        return ErrorRMS.get(polynomial(), x, t);
+        return Error.rootMeanSquare(polynomial(), x, t);
     }
 
     @Override
     public double[] getDegreeToRMS() {
         return degreeToRMS;
+    }
+
+    @Override
+    public double[][] getDegreeLambdaToRMS() {
+        return null;
     }
 }

@@ -16,10 +16,10 @@ import static java.lang.Math.*;
  */
 public class Example_LeastSquaresPCF {
 
-    private static final int TRAINING_SET_SIZE = 100;
+    private static final int TRAINING_SET_SIZE = 300;
 
-    private static final double DOMAIN_MIN = -1000;
-    private static final double DOMAIN_MAX = 1000;
+    private static final double DOMAIN_MIN = -500;
+    private static final double DOMAIN_MAX = 500;
     private static final int DOMAIN_DENSITY = 10000;
 
     public static void main(String[] args) {
@@ -34,8 +34,8 @@ public class Example_LeastSquaresPCF {
         Function polynomial = new LeastSquaresPCF(set.vector(), set.targets()).polynomial();
 
         // plot both original function and its curve estimation using python and plotly
-        // get domain for plot
-        double[] domain = Utils.randomSortedArray(DOMAIN_DENSITY, DOMAIN_MIN, DOMAIN_MAX);
+        // rootMeanSquare domain for plot
+        double[] domain = Utils.randomSortedVector(DOMAIN_DENSITY, DOMAIN_MIN, DOMAIN_MAX);
 
         // creates traces for both functions
         Scatter traceSin = new Scatter(function.name(), domain, function.f(domain));
