@@ -6,21 +6,21 @@ package functions;
  */
 public class CustomFunction extends Function {
 
-    private Image img;
+    private Func func;
     private String name;
 
-    public CustomFunction(Image img) {
-        this(img, "custom function");
+    public CustomFunction(Func func) {
+        this(func, "custom function");
     }
 
-    public CustomFunction(Image img, String name) {
-        this.img = img;
+    public CustomFunction(Func func, String name) {
+        this.func = func;
         this.name = name;
     }
 
     @Override
     public double f(double x) {
-        return img.compute(x);
+        return func.compute(x);
     }
 
     @Override

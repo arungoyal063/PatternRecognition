@@ -1,11 +1,11 @@
 package functions;
 
 /**
- * Functional interface for CustomFunction
+ * Functional interface for one variable.
  * @author Ondrej Kratochvil
  */
 @FunctionalInterface
-public interface Image {
+public interface Func {
 
     double compute(double x);
 }

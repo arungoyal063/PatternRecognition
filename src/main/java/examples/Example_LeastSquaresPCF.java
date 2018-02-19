@@ -4,7 +4,7 @@ import functions.CustomFunction;
 import functions.Function;
 import polynomial_curve_fitting.LeastSquaresPCF;
 import set.TrainingSet;
-import utils.Utils;
+import utils.VectorUtils;
 import visualization.*;
 import visualization.model.*;
 
@@ -35,7 +35,7 @@ public class Example_LeastSquaresPCF {
 
         // plot both original function and its curve estimation using python and plotly
         // rootMeanSquare domain for plot
-        double[] domain = Utils.randomSortedVector(DOMAIN_DENSITY, DOMAIN_MIN, DOMAIN_MAX);
+        double[] domain = VectorUtils.randomSortedVector(DOMAIN_DENSITY, DOMAIN_MIN, DOMAIN_MAX);
 
         // creates traces for both functions
         Scatter traceSin = new Scatter(function.name(), domain, function.f(domain));

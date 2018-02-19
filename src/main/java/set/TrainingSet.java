@@ -1,7 +1,7 @@
 package set;
 
 import functions.Function;
-import utils.Utils;
+import utils.VectorUtils;
 
 public class TrainingSet extends Set {
 
@@ -17,13 +17,13 @@ public class TrainingSet extends Set {
     }
 
     public static TrainingSet randomSorted(Function fun, int size, double domainMin, double domainMax) {
-        double[] x = Utils.randomSortedVector(size, domainMin, domainMax);
+        double[] x = VectorUtils.randomSortedVector(size, domainMin, domainMax);
         double[] t = fun.f(x);
         return new TrainingSet(x, t, domainMin, domainMax);
     }
 
     public static TrainingSet random(Function fun, int size, double domainMin, double domainMax) {
-        double[] x = Utils.randomVector(size, domainMin, domainMax);
+        double[] x = VectorUtils.randomVector(size, domainMin, domainMax);
         double[] t = fun.f(x);
         return new TrainingSet(x, t, domainMin, domainMax);
     }

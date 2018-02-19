@@ -31,7 +31,7 @@ public class Error {
      * @param t the double[] with corresponding targets
      * @return double the root-mean-square error
      */
-    static double sumOfSquares(Function function, double[] x, double[] t) {
+    public static double sumOfSquares(Function function, double[] x, double[] t) {
         double sum = 0;
         for (int n = 0; n < x.length; ++n)
             sum += pow(function.f(x[n]) - t[n], 2);

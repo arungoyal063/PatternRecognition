@@ -2,7 +2,7 @@ package utils;
 
 import java.util.Arrays;
 
-public class Utils {
+public class VectorUtils {
 
     public static double randomDouble(double min, double max) {
         double range = (max - min);
@@ -13,7 +13,7 @@ public class Utils {
         double[] x = new double[size];
 
         for (int i = 0; i < size; ++i)
-            x[i] = Utils.randomDouble(min, max);
+            x[i] = VectorUtils.randomDouble(min, max);
         return x;
     }
 
