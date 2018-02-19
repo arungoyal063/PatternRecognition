@@ -86,7 +86,7 @@ public class LeastSquaresPCF implements PolynomialCurveFitting {
      * Find optimal polynomial coefficients,
      * where polynomial(x) = sum(w[i] * x^i) from i=0 to M
      */
-    protected void setCoefficients() {
+    void setCoefficients() {
         degreeToRMS = new double[MAX_DEGREE + 1];
         double minimalRMS = Double.MAX_VALUE;
         double RMS;
@@ -98,8 +98,8 @@ public class LeastSquaresPCF implements PolynomialCurveFitting {
 
             // solve equation
             // sum(A[i][j]*w[j]) from j=0 to M = T[i]
-            lhs = new Matrix(getA(degree));
-            rhs = new Matrix(getT(degree), degree + 1);
+            lhs = getA(degree);
+            rhs = getT(degree);
 
             try {
                 ans = lhs.solve(rhs);
@@ -136,7 +136,7 @@ public class LeastSquaresPCF implements PolynomialCurveFitting {
      * @param degree the int polynomial degree
      * @return double[][] the matrix A
      */
-    double[][] getA(int degree) {
+    Matrix getA(int degree) {
         double[][] A = new double[degree + 1][degree + 1];
 
         for (int i = 0; i <= degree; ++i) {
@@ -150,7 +150,7 @@ public class LeastSquaresPCF implements PolynomialCurveFitting {
                 A[i][j] = sum;
             }
         }
-        return A;
+        return new Matrix(A);
     }
 
     /**
@@ -159,7 +159,7 @@ public class LeastSquaresPCF implements PolynomialCurveFitting {
      * @param degree the int polynomial degree
      * @return double[] the vector T
      */
-    double[] getT(int degree) {
+    Matrix getT(int degree) {
         double[] T = new double[degree + 1];
 
         for (int i = 0; i <= degree; ++i) {
@@ -170,7 +170,7 @@ public class LeastSquaresPCF implements PolynomialCurveFitting {
 
             T[i] = sum;
         }
-        return T;
+        return new Matrix(T, degree + 1);
     }
 
     @Override

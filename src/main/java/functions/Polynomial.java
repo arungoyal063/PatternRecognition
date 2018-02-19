@@ -1,5 +1,7 @@
 package functions;
 
+import static java.lang.Math.pow;
+
 /**
  * Polynomial
  * @author Ondrej Kratochvil
@@ -18,7 +20,7 @@ public class Polynomial extends Function {
         double result = coefficients[0];
 
         for (int j = 1; j <= degree; ++j)
-            result += coefficients[j] * Math.pow(x, j);
+            result += coefficients[j] * pow(x, j);
 
         return result;
     }
@@ -29,6 +31,14 @@ public class Polynomial extends Function {
      */
     public int degree() {
         return degree;
+    }
+
+    /**
+     * Getter for coefficients
+     * @return double[] the coefficients.
+     */
+    public double[] coefficients() {
+        return coefficients;
     }
 
     @Override

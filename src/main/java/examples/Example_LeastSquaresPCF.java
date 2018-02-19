@@ -18,8 +18,8 @@ public class Example_LeastSquaresPCF {
 
     private static final int TRAINING_SET_SIZE = 300;
 
-    private static final double DOMAIN_MIN = -500;
-    private static final double DOMAIN_MAX = 500;
+    private static final double DOMAIN_MIN = -100;
+    private static final double DOMAIN_MAX = 100;
     private static final int DOMAIN_DENSITY = 10000;
 
     public static void main(String[] args) {
@@ -35,14 +35,14 @@ public class Example_LeastSquaresPCF {
 
         // plot both original function and its curve estimation using python and plotly
         // rootMeanSquare domain for plot
-        double[] domain = VectorUtils.randomSortedVector(DOMAIN_DENSITY, DOMAIN_MIN, DOMAIN_MAX);
+        double[] domain = VectorUtils.randomSortedVector(DOMAIN_DENSITY, -60, 60);
 
         // creates traces for both functions
         Scatter traceSin = new Scatter(function.name(), domain, function.f(domain));
         Scatter tracePol = new Scatter(polynomial.name(), domain, polynomial.f(domain));
 
         // plot figure
-        Figure fig = new Figure(new Layout("Awesome title")).add(traceSin).add(tracePol);
-        new Plotter().plot(new Plot(fig, "curve-fitting-" + function.name()).autoOpen(true));
+        Figure fig = new Figure(new Layout("Polynomial Curve Fitting " + function.name())).add(traceSin).add(tracePol);
+        new Plotter().plot(new Plot(fig, "pcf-" + function.name()).autoOpen(true));
     }
 }

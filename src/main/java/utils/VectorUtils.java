@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 public class VectorUtils {
 
-    public static double randomDouble(double min, double max) {
+    private static double randomDouble(double min, double max) {
         double range = (max - min);
         return (Math.random() * range) + min;
     }
@@ -13,7 +13,7 @@ public class VectorUtils {
         double[] x = new double[size];
 
         for (int i = 0; i < size; ++i)
-            x[i] = VectorUtils.randomDouble(min, max);
+            x[i] = randomDouble(min, max);
         return x;
     }
 
