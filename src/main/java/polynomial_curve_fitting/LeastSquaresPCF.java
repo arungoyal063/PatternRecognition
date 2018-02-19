@@ -30,6 +30,8 @@ import static java.lang.Math.pow;
  */
 public class LeastSquaresPCF implements PolynomialCurveFitting {
 
+    private static System.Logger LOGGER = System.getLogger(LeastSquaresPCF.class.getName());
+
     static final int MAX_DEGREE = 50; // max polynomial degree
     private static final float SPLIT_RATIO = 0.8f; // ratio of training and validation sets
 
@@ -91,14 +93,25 @@ public class LeastSquaresPCF implements PolynomialCurveFitting {
         double[] tempW;
         Matrix lhs, rhs, ans;
 
-        // iterate over all possible polynomial degrees
+        // model comparison - iterate over all possible polynomial degrees
         for (int degree = 0; degree <= MAX_DEGREE; ++degree) {
 
             // solve equation
             // sum(A[i][j]*w[j]) from j=0 to M = T[i]
             lhs = new Matrix(getA(degree));
             rhs = new Matrix(getT(degree), degree + 1);
-            ans = lhs.solve(rhs);
+
+            try {
+                ans = lhs.solve(rhs);
+            } catch (RuntimeException e) {
+                if (e.getMessage().equals("Matrix is singular.")) {
+                    LOGGER.log(System.Logger.Level.ERROR, e.getMessage());
+                    continue;
+                } else {
+                    LOGGER.log(System.Logger.Level.ERROR, "Unknown exception: " + e.getMessage());
+                    throw new RuntimeException(e.getMessage());
+                }
+            }
 
             // extract temporary vector w
             tempW = new double[degree + 1];
@@ -112,10 +125,7 @@ public class LeastSquaresPCF implements PolynomialCurveFitting {
             // updates vector w if RMS is lower than the previous one found
             if (RMS <= minimalRMS) {
                 minimalRMS = RMS;
-                //System.out.println("new min " + RMS + " deg " + degree);
                 w = tempW;
-            } else {
-               // System.out.println("not bet " + RMS );
             }
         }
     }
